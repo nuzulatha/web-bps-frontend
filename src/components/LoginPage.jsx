@@ -8,7 +8,7 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const { loginAction, loading, error, clearError } = useAuth();
+    const {loginAction, loading, error, clearError} = useAuth();
     const navigate = useNavigate();
 
     // Membersihkan error saat pertama kali render (sudah bagus)
