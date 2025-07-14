@@ -9,23 +9,9 @@ import LoginPage from './components/LoginPage';
 import PublicationListPage from './components/PublicationListPage';
 import AddPublicationPage from './components/AddPublicationPage';
 import EditPublicationPage from './components/EditPublicationPage';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/ProtectedRoute'; // Kita akan menggunakan komponen yang diimpor ini
 
-
-/**
- * Komponen ProtectedRoute.
- * Fungsinya untuk melindungi sebuah halaman agar hanya bisa diakses
- * oleh pengguna yang sudah login (memiliki token).
- */
-const ProtectedRoute = ({ children }) => {
-    const { token } = useAuth();
-    if (!token) {
-        // Jika tidak ada token, "lempar" pengguna kembali ke halaman login.
-        return <Navigate to="/login" replace />;
-    }
-    // Jika ada token, tampilkan halaman yang diminta.
-    return children;
-};
+// DEFINISI DUPLIKAT DIHAPUS DARI SINI
 
 /**
  * Komponen utama aplikasi yang mengatur semua rute.
