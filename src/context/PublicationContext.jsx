@@ -33,20 +33,46 @@ const PublicationProvider = ({ children }) => {
         try {
             const added = await publicationService.addPublication(newPub);
             setPublications((prev) => [added, ...prev]);
-            setError(null);
+            return added; // Kembalikan data yang ditambahkan
         } catch (err) {
             setError(err.message);
             throw err;
         }
     };
 
-    const editPublication = (updatedPub) => {
-        setPublications(prev => prev.map(pub => pub.id === updatedPub.id ?
-            updatedPub : pub));
+    // 👇 FUNGSI BARU YANG KRUSIAL
+    const getPublicationById = async (id) => {
+        try {
+            // Tidak perlu set loading global, biarkan komponen yang memanggil menanganinya
+            const data = await publicationService.getPublicationById(id);
+            return data;
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        }
     };
 
-    const deletePublication = (id) => {
-        setPublications(prev => prev.filter(pub => pub.id !== id));
+    // 👇 FUNGSI EDIT DIPERBAIKI (sekarang async)
+    const updatePublication = async (id, updatedData) => {
+        try {
+            const updated = await publicationService.updatePublication(id, updatedData);
+            setPublications(prev => prev.map(pub => (pub.id === updated.id ? updated : pub)));
+            return updated;
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        }
+    };
+
+    // 👇 FUNGSI DELETE DIPERBAIKI (sekarang async)
+    const deletePublication = async (id) => {
+        try {
+            await publicationService.deletePublication(id);
+            setPublications(prev => prev.filter(pub => pub.id !== id));
+        } catch (err) {
+            setError(err.message);
+            throw err;
+        }
     };
 
     return (
@@ -56,7 +82,8 @@ const PublicationProvider = ({ children }) => {
                 loading,
                 error,
                 addPublication,
-                editPublication,
+                getPublicationById,  // <-- Ditambahkan
+                updatePublication, // <-- Nama diubah agar lebih jelas
                 deletePublication,
             }}
         >

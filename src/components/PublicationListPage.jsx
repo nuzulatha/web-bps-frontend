@@ -50,7 +50,8 @@ function PublicationTable({ publications, onEdit, onDelete }) {
                                         </svg>
                                     </button>
                                     <button
-                                        onClick={() => onDelete(pub.id)}
+                                        // 👇 Perubahan di sini: kirim id dan title
+                                        onClick={() => onDelete(pub.id, pub.title)}
                                         className="text-red-500 hover:text-red-700"
                                         title="Hapus Publikasi"
                                     >
@@ -70,21 +71,31 @@ function PublicationTable({ publications, onEdit, onDelete }) {
 
 // 2. Komponen Logika: Mengelola data dan state halaman
 export default function PublicationListPage() {
-    const { publications, deletePublication } = usePublications();
+    // 👇 Ambil loading dan error dari context
+    const { publications, loading, error, deletePublication } = usePublications();
     const navigate = useNavigate();
 
     const handleEdit = (publication) => {
-        // Navigasi ke halaman edit dengan membawa state publikasi
-        // (Asumsi rute '/publications/edit/:id' sudah ada)
         navigate(`/publications/edit/${publication.id}`, { state: { publication } });
     };
 
-    const handleDelete = (id) => {
-        // Konfirmasi sebelum menghapus untuk pengalaman pengguna yang lebih baik
-        if (window.confirm('Apakah Anda yakin ingin menghapus publikasi ini?')) {
-            deletePublication(id);
+    // 👇 Perubahan di sini: terima id dan title
+    const handleDelete = (id, title) => {
+        if (window.confirm(`Apakah Anda yakin ingin menghapus publikasi "${title}"?`)) {
+            deletePublication(id).catch(err => {
+                // Menangani error jika proses delete di context gagal
+                alert("Gagal menghapus: " + err.message);
+            });
         }
     };
+
+    // 👇 Tambahkan blok ini untuk menangani loading dan error
+    if (loading) {
+        return <p className="text-center py-10 font-semibold">Memuat data publikasi...</p>;
+    }
+    if (error) {
+        return <p className="text-center py-10 text-red-600">Terjadi kesalahan: {error}</p>;
+    }
 
     return (
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
