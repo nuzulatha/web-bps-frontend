@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { usePublications } from '../hooks/usePublications';
-import { uploadImageToCloudinary } from '../services/publicationService';
+// Tidak perlu import uploadImageToCloudinary di sini
 import PublicationForm from './PublicationForm';
 
 export default function EditPublicationPage() {
@@ -14,7 +14,7 @@ export default function EditPublicationPage() {
     const [publication, setPublication] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isUploading, setIsUploading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         const fetchPublicationData = async () => {
@@ -31,37 +31,30 @@ export default function EditPublicationPage() {
         fetchPublicationData();
     }, [id, getPublicationById]);
 
-    const handleUpdate = async (formData) => {
-        const { title, description, releaseDate, coverFile } = formData;
-
-        let finalCoverUrl = publication.coverUrl;
-
-        if (coverFile) {
-            setIsUploading(true);
-            try {
-                finalCoverUrl = await uploadImageToCloudinary(coverFile);
-            } catch (err) {
-                alert('Gagal upload gambar baru: ' + err.message);
-                setIsUploading(false);
-                return;
-            } finally {
-                setIsUploading(false);
-            }
+    // handleUpdate sekarang menjadi jauh lebih sederhana
+    const handleUpdate = async (formDataFromForm) => {
+        if (!formDataFromForm.title || !formDataFromForm.releaseDate) {
+            alert('Judul dan Tanggal Rilis harus diisi!');
+            return;
         }
 
-        const updatedPublication = {
-            title,
-            releaseDate,
-            description,
-            coverUrl: finalCoverUrl,
-        };
-
+        setIsSubmitting(true);
         try {
-            await updatePublication(id, updatedPublication);
+            // 1. Gabungkan data dari form dengan URL yang sudah ada
+            const payload = {
+                ...formDataFromForm,
+                existingCoverUrl: publication.coverUrl 
+            };
+            
+            // 2. Langsung kirim payload ke service
+            await updatePublication(id, payload);
+
             alert('Publikasi berhasil diperbarui.');
             navigate('/publications');
         } catch (err) {
             alert('Gagal memperbarui publikasi: ' + err.message);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -75,12 +68,97 @@ export default function EditPublicationPage() {
             <PublicationForm
                 onSubmit={handleUpdate}
                 publication={publication}
-                buttonText={isUploading ? 'Mengupload...' : 'Simpan Perubahan'}
-                isSubmitting={isUploading}
+                buttonText={isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                isSubmitting={isSubmitting}
             />
         </div>
     );
 }
+
+
+// // src/components/EditPublicationPage.jsx
+
+// import React, { useState, useEffect } from 'react';
+// import { useParams, useNavigate, Link } from 'react-router-dom';
+// import { usePublications } from '../hooks/usePublications';
+// import { uploadImageToCloudinary } from '../services/publicationService';
+// import PublicationForm from './PublicationForm';
+
+// export default function EditPublicationPage() {
+//     const { id } = useParams();
+//     const navigate = useNavigate();
+//     const { getPublicationById, updatePublication } = usePublications();
+
+//     const [publication, setPublication] = useState(null);
+//     const [loading, setLoading] = useState(true);
+//     const [error, setError] = useState(null);
+//     const [isUploading, setIsUploading] = useState(false);
+
+//     useEffect(() => {
+//         const fetchPublicationData = async () => {
+//             setLoading(true);
+//             try {
+//                 const data = await getPublicationById(id);
+//                 setPublication(data);
+//             } catch (err) {
+//                 setError("Gagal memuat data. " + err.message);
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+//         fetchPublicationData();
+//     }, [id, getPublicationById]);
+
+//     const handleUpdate = async (formData) => {
+//         const { title, description, releaseDate, coverFile } = formData;
+
+//         let finalCoverUrl = publication.coverUrl;
+
+//         if (coverFile) {
+//             setIsUploading(true);
+//             try {
+//                 finalCoverUrl = await uploadImageToCloudinary(coverFile);
+//             } catch (err) {
+//                 alert('Gagal upload gambar baru: ' + err.message);
+//                 setIsUploading(false);
+//                 return;
+//             } finally {
+//                 setIsUploading(false);
+//             }
+//         }
+
+//         const updatedPublication = {
+//             title,
+//             releaseDate,
+//             description,
+//             coverUrl: finalCoverUrl,
+//         };
+
+//         try {
+//             await updatePublication(id, updatedPublication);
+//             alert('Publikasi berhasil diperbarui.');
+//             navigate('/publications');
+//         } catch (err) {
+//             alert('Gagal memperbarui publikasi: ' + err.message);
+//         }
+//     };
+
+//     if (loading) return <div className="text-center py-10 font-semibold">Memuat data...</div>;
+//     if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
+//     if (!publication) return <div className="text-center py-10">Publikasi tidak ditemukan.</div>;
+
+//     return (
+//         <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+//             <h1 className="text-2xl font-bold text-gray-800 mb-6">Edit Publikasi</h1>
+//             <PublicationForm
+//                 onSubmit={handleUpdate}
+//                 publication={publication}
+//                 buttonText={isUploading ? 'Mengupload...' : 'Simpan Perubahan'}
+//                 isSubmitting={isUploading}
+//             />
+//         </div>
+//     );
+// }
 
 // import React, { useState, useEffect } from 'react';
 // import { useParams, useNavigate, Link } from 'react-router-dom';

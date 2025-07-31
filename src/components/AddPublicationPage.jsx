@@ -3,51 +3,38 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePublications } from '../hooks/usePublications';
-import { uploadImageToCloudinary } from '../services/publicationService'; // Pastikan fungsi ini ada
+// Anda tidak perlu mengimpor uploadImageToCloudinary di sini lagi
 import PublicationForm from './PublicationForm';
 
 export default function AddPublicationPage() {
     const navigate = useNavigate();
     const { addPublication } = usePublications();
-    const [isUploading, setIsUploading] = useState(false);
+    // Ganti state isUploading menjadi isSubmitting agar lebih umum
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleAdd = async (formData) => {
-        const { title, description, releaseDate, coverFile } = formData;
+    // handleAdd sekarang menjadi jauh lebih sederhana
+    const handleAdd = async (formDataFromForm) => {
+        // formDataFromForm adalah objek berisi:
+        // { title, description, releaseDate, coverFile }
 
-        if (!title || !releaseDate) {
+        if (!formDataFromForm.title || !formDataFromForm.releaseDate) {
             alert('Judul dan Tanggal Rilis harus diisi!');
             return;
         }
 
-        let finalCoverUrl = `https://placehold.co/200x280/7f8c8d/ffffff?text=${encodeURIComponent(title)}`;
-
-        if (coverFile) {
-            setIsUploading(true);
-            try {
-                // 1. Upload dulu ke Cloudinary
-                finalCoverUrl = await uploadImageToCloudinary(coverFile);
-            } catch (err) {
-                alert('Gagal upload gambar: ' + err.message);
-                setIsUploading(false);
-                return; // Hentikan proses jika upload gagal
-            } finally {
-                setIsUploading(false);
-            }
-        }
-
-        const newPublication = {
-            title,
-            releaseDate,
-            description,
-            coverUrl: finalCoverUrl, // 2. Kirim URL-nya ke backend
-        };
-
+        setIsSubmitting(true);
         try {
-            await addPublication(newPublication);
+            // 1. Langsung kirim semua data dari form ke service.
+            // Biarkan service yang mengurus upload dan pembuatan payload.
+            await addPublication(formDataFromForm);
+            
             alert('Publikasi berhasil ditambahkan.');
             navigate('/publications');
         } catch (err) {
+            // Service akan melempar error jika ada masalah (upload atau API)
             alert('Gagal menambah publikasi: ' + err.message);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -56,12 +43,13 @@ export default function AddPublicationPage() {
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Tambah Publikasi Baru</h1>
             <PublicationForm
                 onSubmit={handleAdd}
-                buttonText={isUploading ? 'Mengupload...' : 'Tambah Publikasi'}
-                isSubmitting={isUploading}
+                buttonText={isSubmitting ? 'Menyimpan...' : 'Tambah Publikasi'}
+                isSubmitting={isSubmitting}
             />
         </div>
     );
 }
+
 
 
 // import React from 'react';
