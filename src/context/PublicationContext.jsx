@@ -29,16 +29,32 @@ const PublicationProvider = ({ children }) => {
         fetchData();
     }, [token]);
 
-    const addPublication = async (newPub) => {
+    const addPublication = async (formData) => {
+        // formData dari komponen berisi: { title, ..., coverFile }
         try {
-            const added = await publicationService.addPublication(newPub);
-            setPublications((prev) => [added, ...prev]);
-            return added; // Kembalikan data yang ditambahkan
+            // Cukup panggil SATU fungsi "pintar" dari service.
+            // Tidak perlu lagi upload atau buat payload di sini.
+            const newPublication = await publicationService.addPublication(formData);
+
+            // Update state lokal
+            setPublications((prev) => [newPublication, ...prev]);
+
         } catch (err) {
-            setError(err.message);
+            console.error("Gagal dari context:", err);
             throw err;
         }
     };
+
+    // const addPublication = async (newPub) => {
+    //     try {
+    //         const added = await publicationService.addPublication(newPub);
+    //         setPublications((prev) => [added, ...prev]);
+    //         return added; // Kembalikan data yang ditambahkan
+    //     } catch (err) {
+    //         setError(err.message);
+    //         throw err;
+    //     }
+    // };
 
     // 👇 FUNGSI BARU YANG KRUSIAL
     const getPublicationById = async (id) => {
