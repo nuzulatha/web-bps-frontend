@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth"; 
 
 const navItems = [
     { id: "publications", label: "Daftar Publikasi", path: "/publications" },
@@ -22,9 +23,24 @@ function BpsLogo() {
 export default function Navbar() {
     const location = useLocation();
 
-    const handleLogout = async () => {
-        // Akan diisi nanti 
+    // 2. Dapatkan fungsi logoutAction dari context
+    const { logoutAction, isAuthenticated } = useAuth();
+
+    // 3. Isi fungsi handleLogout untuk memanggil logoutAction
+    const handleLogout = () => {
+        logoutAction();
     };
+
+    // Filter item navigasi berdasarkan status login
+    const filteredNavItems = navItems.filter(item => {
+        if (isAuthenticated) {
+            // Jika sudah login, tampilkan semua KECUALI login (jika ada)
+            return item.id !== 'login';
+        }
+        // Jika belum login, hanya tampilkan item publik (jika ada) dan login
+        // Dalam kasus Anda, mungkin hanya "Daftar Publikasi" yang publik
+        return item.id === 'publications'; // Sesuaikan dengan kebutuhan
+    });
 
     // Jangan tampilkan navbar di halaman login 
     if (location.pathname === "/login") {
@@ -38,11 +54,11 @@ export default function Navbar() {
                     <div className="flex items-center space-x-3">
                         <BpsLogo />
                         <span className="text-white text-base md:text-lg font-bold tracking-wider hidden sm:block">
-                            BPS PROVINSI BENGKULU
+                            BPS PROVINSI SUMATERA SELATAN
                         </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                        {navItems.map((item) => {
+                        {filteredNavItems.map((item) => {
                             const isActive =
                                 location.pathname === item.path ||
                                 (item.id === "add" &&
