@@ -28,7 +28,7 @@ function PublicationTable({ publications, onEdit, onDelete }) {
                             <td className="px-6 py-4 text-gray-600">{pub.releaseDate}</td>
                             <td className="px-6 py-4 flex justify-center items-center">
                                 <img
-                                    src={pub.cover_url}
+                                    src={pub.coverUrl}
                                     alt={`Sampul ${pub.title}`}
                                     className="h-24 w-auto object-cover rounded shadow-md"
                                     onError={e => {
@@ -50,7 +50,6 @@ function PublicationTable({ publications, onEdit, onDelete }) {
                                         </svg>
                                     </button>
                                     <button
-                                        // 👇 Perubahan di sini: kirim id dan title
                                         onClick={() => onDelete(pub.id, pub.title)}
                                         className="text-red-500 hover:text-red-700"
                                         title="Hapus Publikasi"
