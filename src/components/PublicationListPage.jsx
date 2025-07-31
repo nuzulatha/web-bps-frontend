@@ -71,6 +71,9 @@ function PublicationTable({ publications, onEdit, onDelete }) {
 
 // 2. Komponen Logika: Mengelola data dan state halaman
 export default function PublicationListPage() {
+    const contextValue = usePublications();
+    console.log('INI ISI CONTEXT YANG SEBENARNYA DI SERVER:', contextValue); // <-- TAMBAHKAN INI
+
     // 👇 Ambil loading dan error dari context
     const { publications, loading, error, deletePublication } = usePublications();
     const navigate = useNavigate();
