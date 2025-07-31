@@ -109,12 +109,12 @@ export default function PublicationListPage() {
                     </h1>
                     <p className="text-gray-500 mt-1">Sumber data publikasi terkini</p>
                 </div>
-                <button
+                {/* <button
                     onClick={() => navigate('/publications/add')}
                     className="bg-sky-700 hover:bg-sky-800 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300"
                 >
                     Tambah Publikasi
-                </button>
+                </button> */}
             </header>
 
             <PublicationTable
