@@ -13,7 +13,7 @@ const navItems = [
 function BpsLogo() {
     return (
         <img
-            src="https://res.cloudinary.com/djcm0swgo/image/upload/v1751775675/bpslogo_1_ldppzk.png"
+            src="https://tse4.mm.bing.net/th/id/OIP.Yu9aIbnQkphNKXCzIT2XfQHaFQ?rs=1&pid=ImgDetMain&o=7&rm=3"
             alt="BPS Logo"
             className="h-12 w-12"
         />
