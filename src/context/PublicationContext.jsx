@@ -1,6 +1,6 @@
 // src/context/PublicationContext.jsx
 
-import React, { createContext, useState, useEffect, useCallback } from 'react'; // Tambahkan useCallback
+import React, { createContext, useState, useEffect } from 'react';
 import { publicationService } from "../services/publicationService";
 import { useAuth } from "../hooks/useAuth";
 
@@ -11,37 +11,40 @@ export const PublicationProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { token } = useAuth();
+    
+    // 1. Gunakan state sederhana untuk memicu refresh data
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const refreshData = () => setRefreshTrigger(count => count + 1);
 
-    // 1. Bungkus logika fetch data ke dalam useCallback
-    // Ini agar kita bisa memanggilnya dari fungsi lain tanpa menyebabkan loop tak terbatas
-    const fetchAllPublications = useCallback(async () => {
+    // 2. useEffect sekarang hanya bergantung pada 'token' dan 'refreshTrigger'
+    useEffect(() => {
         if (!token) {
             setLoading(false);
             return;
         }
-        setLoading(true);
-        try {
-            const data = await publicationService.getPublications();
-            setPublications(data);
-            setError(null);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }, [token]); // Dependensi tetap token
 
-    // 2. Panggil fetchAllPublications saat komponen pertama kali dimuat
-    useEffect(() => {
+        const fetchAllPublications = async () => {
+            setLoading(true);
+            try {
+                const data = await publicationService.getPublications();
+                setPublications(data);
+                setError(null);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchAllPublications();
-    }, [fetchAllPublications]);
+    }, [token, refreshTrigger]); // Jalankan ulang saat token atau trigger berubah
 
 
     const addPublication = async (publicationData) => {
         try {
             await publicationService.addPublication(publicationData);
-            // 3. Panggil lagi untuk refresh data setelah berhasil menambah
-            await fetchAllPublications(); 
+            // 3. Panggil refreshData() untuk memicu useEffect di atas
+            refreshData(); 
         } catch (err) {
             throw err;
         }
@@ -50,8 +53,8 @@ export const PublicationProvider = ({ children }) => {
     const updatePublication = async (id, publicationData) => {
         try {
             await publicationService.updatePublication(id, publicationData);
-            // 4. Panggil lagi untuk refresh data setelah berhasil meng-update
-            await fetchAllPublications();
+            // 4. Panggil refreshData() untuk memicu useEffect di atas
+            refreshData();
         } catch (err) {
             throw err;
         }
@@ -60,14 +63,13 @@ export const PublicationProvider = ({ children }) => {
     const deletePublication = async (id) => {
         try {
             await publicationService.deletePublication(id);
-            // Untuk delete, lebih cepat memfilter langsung daripada refresh
+            // Untuk delete, lebih cepat memfilter langsung
             setPublications(prev => prev.filter(pub => pub.id !== id));
         } catch (err) {
             throw err;
         }
     };
 
-    // Fungsi getPublicationById tidak perlu diubah
     const getPublicationById = async (id) => {
         try {
             return await publicationService.getPublicationById(id);
