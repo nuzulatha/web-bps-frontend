@@ -16,6 +16,7 @@ function EditPublicationPage() {
     // useEffect untuk mengambil data saat komponen pertama kali dimuat
     useEffect(() => {
         const fetchPublicationData = async () => {
+            setError(null); // <-- TAMBAHKAN INI untuk membersihkan error lama
             setLoading(true); // Mulai loading
             try {
                 const data = await getPublicationById(id);
