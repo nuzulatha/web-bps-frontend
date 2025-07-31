@@ -59,10 +59,13 @@ const AuthProvider = ({ children }) => {
         setError(null);
     };
 
+    const isAuthenticated = !!token; // '!!' mengubah nilai truthy/falsy menjadi boolean murni
+
     return (
         <AuthContext.Provider value={{
             user, token, loginAction, logoutAction,
-            loading, error, clearError
+            loading, error, clearError,
+            isAuthenticated
         }}>
             {children}
         </AuthContext.Provider>

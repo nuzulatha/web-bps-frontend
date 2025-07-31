@@ -21,28 +21,29 @@ export default function App() {
         <Routes> 
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/publications" element={<PublicationListPage />} />
+          
+          {/* Grup Rute yang Dilindungi */}
+          {/* Gunakan ProtectedRoute sebagai "penjaga gerbang" utama */}
+          <Route element={<ProtectedRoute />}>
+            {/* Semua rute di dalam sini sekarang dilindungi */}
+            <Route 
+              path="/publications" 
+              element={<PublicationListPage />} 
+            />
+            <Route 
+              path="/publications/add" 
+              element={<AddPublicationPage />} 
+            />
+            <Route 
+              path="/publications/edit/:id" 
+              element={<EditPublicationPage />} 
+            />
+            
+            {/* Redirect dari root ke halaman publikasi */}
+            <Route path="/" element={<Navigate to="/publications" replace />} />
+          </Route>
 
-          {/* Protected Routes */}
-          <Route
-            path="/publications/add"
-            element={
-              <ProtectedRoute>
-                <AddPublicationPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/publications/edit/:id"
-            element={
-              <ProtectedRoute>
-                <EditPublicationPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Redirect Routes */}
-          <Route path="/" element={<Navigate to="/publications" replace />} />
+          {/* Redirect untuk rute yang tidak ditemukan */}
           <Route path="*" element={<Navigate to="/publications" replace />} />
         </Routes> 
       </main> 
