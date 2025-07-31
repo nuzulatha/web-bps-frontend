@@ -49,7 +49,6 @@ const PublicationProvider = ({ children }) => {
             };
             
             // 3. Panggil service untuk menyimpan data ke backend dengan payload yang sudah benar
-            // Asumsi nama fungsi di service adalah `createPublication`
             const newPublicationFromDB = await publicationService.createPublication(payload);
 
             // 4. Update state lokal dengan data baru yang valid dari database
@@ -63,7 +62,7 @@ const PublicationProvider = ({ children }) => {
             throw err; // Lempar kembali error agar bisa ditangani di komponen
         }
     };
-    
+
     // const addPublication = async (newPub) => {
     //     try {
     //         const added = await publicationService.addPublication(newPub);
