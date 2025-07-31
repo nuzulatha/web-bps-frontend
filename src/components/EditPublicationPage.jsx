@@ -29,7 +29,7 @@ function EditPublicationPage() {
         };
 
         fetchPublicationData();
-    }, [id, getPublicationById]); // Jalankan ulang jika id berubah
+    }, [id, getPublicationById, setError]); // Jalankan ulang jika id berubah
 
     // Handler untuk mengirim form update
     const handleUpdate = async (formData) => {
