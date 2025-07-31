@@ -28,7 +28,7 @@ function PublicationTable({ publications, onEdit, onDelete }) {
                             <td className="px-6 py-4 text-gray-600">{pub.releaseDate}</td>
                             <td className="px-6 py-4 flex justify-center items-center">
                                 <img
-                                    src={pub.coverUrl}
+                                    src={pub.cover_url}
                                     alt={`Sampul ${pub.title}`}
                                     className="h-24 w-auto object-cover rounded shadow-md"
                                     onError={e => {
@@ -75,7 +75,7 @@ export default function PublicationListPage() {
     console.log('INI ISI CONTEXT YANG SEBENARNYA DI SERVER:', contextValue); // <-- TAMBAHKAN INI
 
     // 👇 Ambil loading dan error dari context
-    const { publications, loading, error, deletePublication } = usePublications();
+    const { publications, loading, error, deletePublication } = contextValue;
     const navigate = useNavigate();
 
     const handleEdit = (publication) => {
