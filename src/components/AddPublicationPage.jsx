@@ -1,21 +1,53 @@
-import React from 'react';
+// src/components/AddPublicationPage.jsx
+
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePublications } from '../hooks/usePublications';
-import PublicationForm from './PublicationForm'; // Menggunakan komponen form yang bisa dipakai ulang
+import { uploadImageToCloudinary } from '../services/publicationService'; // Pastikan fungsi ini ada
+import PublicationForm from './PublicationForm';
 
-function AddPublicationPage() {
+export default function AddPublicationPage() {
     const navigate = useNavigate();
     const { addPublication } = usePublications();
+    const [isUploading, setIsUploading] = useState(false);
 
     const handleAdd = async (formData) => {
+        const { title, description, releaseDate, coverFile } = formData;
+
+        if (!title || !releaseDate) {
+            alert('Judul dan Tanggal Rilis harus diisi!');
+            return;
+        }
+
+        let finalCoverUrl = `https://placehold.co/200x280/7f8c8d/ffffff?text=${encodeURIComponent(title)}`;
+
+        if (coverFile) {
+            setIsUploading(true);
+            try {
+                // 1. Upload dulu ke Cloudinary
+                finalCoverUrl = await uploadImageToCloudinary(coverFile);
+            } catch (err) {
+                alert('Gagal upload gambar: ' + err.message);
+                setIsUploading(false);
+                return; // Hentikan proses jika upload gagal
+            } finally {
+                setIsUploading(false);
+            }
+        }
+
+        const newPublication = {
+            title,
+            releaseDate,
+            description,
+            coverUrl: finalCoverUrl, // 2. Kirim URL-nya ke backend
+        };
+
         try {
-            // Logika submit sekarang hanya memanggil fungsi dari context
-            // Semua proses upload dan lainnya sebaiknya ditangani di dalam context atau service
-            await addPublication(formData); 
-            alert('Publikasi berhasil ditambahkan!');
+            await addPublication(newPublication);
+            alert('Publikasi berhasil ditambahkan.');
             navigate('/publications');
         } catch (err) {
-            alert('Gagal menambahkan publikasi: ' + err.message);
+            alert('Gagal menambah publikasi: ' + err.message);
         }
     };
 
@@ -24,13 +56,47 @@ function AddPublicationPage() {
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Tambah Publikasi Baru</h1>
             <PublicationForm
                 onSubmit={handleAdd}
-                buttonText="Tambah Publikasi"
+                buttonText={isUploading ? 'Mengupload...' : 'Tambah Publikasi'}
+                isSubmitting={isUploading}
             />
         </div>
     );
 }
 
-export default AddPublicationPage;
+
+// import React from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import { usePublications } from '../hooks/usePublications';
+// import PublicationForm from './PublicationForm'; // Menggunakan komponen form yang bisa dipakai ulang
+
+// function AddPublicationPage() {
+//     const navigate = useNavigate();
+//     const { addPublication } = usePublications();
+
+//     const handleAdd = async (formData) => {
+//         try {
+//             // Logika submit sekarang hanya memanggil fungsi dari context
+//             // Semua proses upload dan lainnya sebaiknya ditangani di dalam context atau service
+//             await addPublication(formData); 
+//             alert('Publikasi berhasil ditambahkan!');
+//             navigate('/publications');
+//         } catch (err) {
+//             alert('Gagal menambahkan publikasi: ' + err.message);
+//         }
+//     };
+
+//     return (
+//         <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+//             <h1 className="text-2xl font-bold text-gray-800 mb-6">Tambah Publikasi Baru</h1>
+//             <PublicationForm
+//                 onSubmit={handleAdd}
+//                 buttonText="Tambah Publikasi"
+//             />
+//         </div>
+//     );
+// }
+
+// export default AddPublicationPage;
 
 // // src/components/AddPublicationPage.jsx 
 
