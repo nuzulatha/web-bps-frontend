@@ -7,7 +7,7 @@ function EditPublicationPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     // Ambil fungsi asinkron dari context
-    const { getPublicationById, updatePublication } = usePublications();
+    const { getPublicationById, updatePublication} = usePublications();
 
     const [publication, setPublication] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -29,7 +29,7 @@ function EditPublicationPage() {
         };
 
         fetchPublicationData();
-    }, [id, getPublicationById, setError]); // Jalankan ulang jika id berubah
+    }, [id, getPublicationById]); // Jalankan ulang jika id berubah
 
     // Handler untuk mengirim form update
     const handleUpdate = async (formData) => {
